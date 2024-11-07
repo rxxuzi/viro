@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 87">
+  <!-- Define gradient -->
+  <defs>
+    <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a86ff"/>
+      <stop offset="100%" style="stop-color:#ff006e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Triangle -->
+  <path d="M50 0 L100 87 L0 87 Z" fill="url(#triangleGradient)"/>
+  
+  <!-- Eye - white background -->
+  <path d="M20 43.5 C20 43.5 35 28 50 28 C65 28 80 43.5 80 43.5 C80 43.5 65 59 50 59 C35 59 20 43.5 20 43.5 Z" fill="white"/>
+
+  <!-- Eye - inner circle -->
+  <circle cx="50" cy="43.5" r="15" fill="url(#triangleGradient)"/>
+</svg>
