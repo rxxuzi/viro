@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Send, Paperclip, Loader2 } from 'lucide-react';
+import { Send, Paperclip, Loader2, Code } from 'lucide-react';
 import { Mode } from '../App';
-import { LanguageSelector } from './LanguageSelector';
+import { FilePreviewModal } from './FilePreviewModal';
 
 interface ChatInputProps {
   input: string;
@@ -16,6 +16,17 @@ interface ChatInputProps {
   error?: string;
   className?: string;
 }
+
+const languages = [
+  { id: 'javascript', label: 'JavaScript' },
+  { id: 'typescript', label: 'TypeScript' },
+  { id: 'python', label: 'Python' },
+  { id: 'go', label: 'Go' },
+  { id: 'java', label: 'Java' },
+  { id: 'cpp', label: 'C++' },
+  { id: 'c', label: 'C' },
+  { id: 'rust', label: 'Rust' },
+];
 
 export function ChatInput({
   input,
@@ -32,11 +43,12 @@ export function ChatInput({
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [fileSize, setFileSize] = useState<number>(0);
+  const [fileContent, setFileContent] = useState<string>('');
   const [isFocused, setIsFocused] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       onSubmit(e);
     }
@@ -46,7 +58,11 @@ export function ChatInput({
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setFileSize(selectedFile.size);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFileContent(e.target?.result as string);
+      };
+      reader.readAsText(selectedFile);
     }
   };
 
@@ -57,88 +73,100 @@ export function ChatInput({
     }
   }, [input]);
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-  };
-
   return (
-    <div className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A] to-transparent pb-6 pt-12 px-4 md:px-0 ${className}`}>
-      <div className="max-w-4xl mx-auto space-y-4">
-        {mode === 'code' && (
-          <LanguageSelector language={language} setLanguage={setLanguage} />
-        )}
-
-        <div className={`bg-[#1A1A1A] rounded-2xl shadow-lg transition-all duration-200 ${
-          isFocused ? 'ring-2 ring-[#00D1FF]/50 shadow-[#00D1FF]/20' : ''
-        }`}>
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder="Ask me anything... (Shift + Enter to send)"
-            className={`w-full bg-transparent px-6 py-4 focus:outline-none transition-all resize-none ${
-              error ? 'text-red-500' : 'text-white'
-            } min-h-[52px] placeholder:text-white/30`}
-            style={{ maxHeight: '200px', overflowY: 'auto' }}
-          />
-          
-          <div className="flex justify-between items-center px-4 py-2">
-            <div className="flex items-center gap-2">
-              <label className="p-2 hover:bg-white/5 rounded-xl cursor-pointer transition-colors">
-                <Paperclip className="w-5 h-5 text-white/50" />
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  accept=".c,.py,.java,.js,.cpp,.go,.txt,.md,.html,.php"
-                />
-              </label>
-              {error && <span className="text-sm text-red-500">{error}</span>}
-            </div>
+    <>
+      <div className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A] to-transparent pb-6 pt-12 px-4 md:px-0 ${className}`}>
+        <div className="max-w-4xl mx-auto space-y-4">
+          <div className={`bg-[#1A1A1A] rounded-2xl shadow-lg transition-all duration-700 ${
+            isFocused ? 'ring-2 ring-[#00D1FF]/50 shadow-[#00D1FF]/20' : ''
+          }`}>
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder="Ask me anything... (Enter to send, Shift + Enter for new line)"
+              className={`w-full bg-transparent px-6 py-4 focus:outline-none transition-all resize-none ${
+                error ? 'text-red-500' : 'text-white'
+              } min-h-[52px] placeholder:text-white/30`}
+              style={{ maxHeight: '200px', overflowY: 'auto' }}
+            />
             
-            <button
-              onClick={(e) => onSubmit(e as any)}
-              disabled={isLoading}
-              className="p-2 bg-gradient-to-r from-[#00D1FF] to-[#FF3DFF] rounded-xl disabled:opacity-50 transition-all hover:shadow-lg hover:shadow-[#00D1FF]/20 hover:scale-105 active:scale-95"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-        </div>
+            <div className="flex justify-between items-center px-4 py-2">
+              <div className="flex items-center gap-2">
+                <label className="p-2 hover:bg-white/5 rounded-xl cursor-pointer transition-colors">
+                  <Paperclip className="w-5 h-5 text-white/50" />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                    accept=".c,.py,.java,.js,.cpp,.go,.txt,.md,.html,.php"
+                  />
+                </label>
 
-        {file && (
-          <div className="bg-[#1A1A1A] rounded-2xl p-4 shadow-lg">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-[#00D1FF]">
-                {file.name} ({formatFileSize(fileSize)})
-              </span>
+                {file && (
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    <span className="text-sm text-white/70">{file.name}</span>
+                  </button>
+                )}
+
+                {mode === 'code' && (
+                  <div className="relative">
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      className="appearance-none bg-white/5 text-white/70 text-sm pl-8 pr-3 py-1.5 rounded-lg focus:outline-none hover:bg-white/10 transition-colors cursor-pointer"
+                    >
+                      {languages.map(({ id, label }) => (
+                        <option key={id} value={id}>{label}</option>
+                      ))}
+                    </select>
+                    <Code className="w-4 h-4 text-white/50 absolute left-2 top-1/2 -translate-y-1/2" />
+                  </div>
+                )}
+
+                {error && <span className="text-sm text-red-500">{error}</span>}
+              </div>
+              
               <button
-                onClick={() => {
-                  setFile(null);
-                  if (fileInputRef.current) {
-                    fileInputRef.current.value = '';
-                  }
-                }}
-                className="text-white/50 hover:text-white transition-colors"
+                onClick={(e) => onSubmit(e as any)}
+                disabled={isLoading}
+                className="p-2 bg-[#00D1FF] rounded-xl disabled:opacity-50 transition-all hover:shadow-lg hover:shadow-[#00D1FF]/20 hover:scale-105 active:scale-95"
               >
-                ×
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
-        )}
+
+          <p className="text-center text-white/30 text-sm">
+            Viro may make mistakes. Please double-check responses.
+          </p>
+        </div>
       </div>
-    </div>
+
+      <FilePreviewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        file={file}
+        content={fileContent}
+        onRemove={() => {
+          setFile(null);
+          setFileContent('');
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }}
+      />
+    </>
   );
 }
