@@ -7,7 +7,6 @@ import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import { Copy, Check } from 'lucide-react';
-import { MessageActions } from './MessageActions';
 
 interface MessageProps {
   message: {
@@ -21,6 +20,22 @@ export function Message({ message, onRegenerate }: MessageProps) {
   const [copiedBlock, setCopiedBlock] = useState<string | null>(null);
 
   const handleCopyCode = async (code: string) => {
+    if (!navigator?.clipboard) {
+      const textArea = document.createElement('textarea');
+      textArea.value = code;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopiedBlock(code);
+        setTimeout(() => setCopiedBlock(null), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+      document.body.removeChild(textArea);
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(code);
       setCopiedBlock(code);
@@ -28,14 +43,6 @@ export function Message({ message, onRegenerate }: MessageProps) {
     } catch (err) {
       console.error('Failed to copy:', err);
     }
-  };
-
-  const handleFeedback = (type: 'good' | 'bad') => {
-    console.log(`Feedback: ${type}`);
-  };
-
-  const handleReport = () => {
-    console.log('Report message');
   };
 
   return (
@@ -96,14 +103,6 @@ export function Message({ message, onRegenerate }: MessageProps) {
       >
         {message.content}
       </ReactMarkdown>
-      {message.role === 'assistant' && (
-        <MessageActions
-          onRegenerate={onRegenerate || (() => {})}
-          onFeedback={handleFeedback}
-          onReport={handleReport}
-          onCopyRaw={() => handleCopyCode(message.content)}
-        />
-      )}
     </div>
   );
 }

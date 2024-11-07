@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Settings, Shield, HelpCircle, FileText, Trash2 } from 'lucide-react';
+import { X, Shield, HelpCircle, FileText, Trash2 } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -8,7 +8,6 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { icon: Settings, label: 'API Settings', path: '/api' },
   { icon: HelpCircle, label: 'Help', path: '/help' },
   { icon: Shield, label: 'Security', path: '/security' },
   { icon: FileText, label: 'License', path: '/license' },

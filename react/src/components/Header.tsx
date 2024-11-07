@@ -22,7 +22,7 @@ export function Header({ mode, setMode, onMenuClick }: HeaderProps) {
           </button>
           <div className="flex items-center gap-2">
             <img src="/viro-logo.svg" alt="VIRO AI" className="w-8 h-8" />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00D1FF] to-[#FF3DFF] bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00D1FF] to-[#FF3DFF] bg-clip-text text-transparent select-none">
               VIRO AI
             </h1>
           </div>
