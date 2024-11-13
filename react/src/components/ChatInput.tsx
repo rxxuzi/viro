@@ -76,14 +76,14 @@ export function ChatInput({
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 100)}px`;
     }
   }, [input]);
 
   return (
     <>
-      <div className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A] to-transparent pb-6 pt-12 px-4 md:px-0 ${className}`}>
-        <div className="max-w-4xl mx-auto space-y-4">
+      <div className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A] to-transparent pb-3 pt-8 px-4 md:px-0 ${className}`}>
+        <div className="max-w-4xl mx-auto space-y-2">
           <div 
             className="bg-[#1A1A1A] rounded-2xl shadow-lg transition-all duration-700 overflow-hidden"
             style={{
@@ -99,8 +99,8 @@ export function ChatInput({
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 placeholder="How can Viro help you today? (Shift + Enter for new line)"
-                className="w-full bg-transparent px-6 py-4 resize-none text-white min-h-[52px] placeholder:text-white/30 focus:outline-none focus:ring-0 border-none"
-                style={{ maxHeight: '200px', overflowY: 'auto' }}
+                className="w-full bg-transparent px-6 py-3 resize-none text-white min-h-[46px] placeholder:text-white/30 focus:outline-none focus:ring-0 border-none"
+                style={{ maxHeight: '100px', overflowY: 'auto' }}
               />
               <div 
                 className="absolute bottom-0 left-0 right-0 h-[2px] transition-transform duration-700 ease-out"
@@ -166,7 +166,7 @@ export function ChatInput({
             </div>
           </div>
 
-          <p className="text-center text-white/30 text-sm">
+          <p className="text-center text-white/30 text-xs">
             Viro may make mistakes. Please double-check responses.
           </p>
         </div>

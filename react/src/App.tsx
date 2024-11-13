@@ -6,14 +6,14 @@ import { Message } from './components/Message';
 
 export type Mode = 'ask' | 'code' | 'docs' | 'fix';
 
-interface Message {
+interface MessageType {
   role: 'user' | 'assistant';
   content: string;
   id: string;
 }
 
-function App() {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function App() {
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [input, setInput] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -130,7 +130,7 @@ function App() {
       />
 
       <main className={`flex-1 container mx-auto px-4 transition-all duration-500 ease-in-out ${
-        hasInteracted ? 'pt-24 pb-48' : 'pt-0 flex items-center'
+        hasInteracted ? 'pt-24 pb-28' : 'pt-0 flex items-center'
       }`}>
         <div className={`transition-all duration-500 ease-in-out ${
           hasInteracted ? 'opacity-100' : 'opacity-0'
@@ -164,4 +164,3 @@ function App() {
     </div>
   );
 }
-export default App;
