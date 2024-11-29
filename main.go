@@ -14,7 +14,7 @@ import (
     "strings"
 )
 
-const version = "0.1.3"
+const version = "0.1.4"
 const maxsize = 10 << 20 // 10MB
 var model string
 var prompts []string
@@ -106,7 +106,7 @@ func handleAsk(w http.ResponseWriter, r *http.Request) {
         }
 
         ext := filepath.Ext(header.Filename)
-        allowedExtensions := []string{".c", ".py", ".java", ".js", ".cpp", ".go", ".txt", ".md", ".html", ".php"}
+        allowedExtensions := []string{".c", ".py", ".java", ".js", ".cpp", ".go", ".txt", ".md", ".html", ".php",".tsx"}
         allowed := false
         for _, allowedExt := range allowedExtensions {
             if ext == allowedExt {
@@ -168,7 +168,7 @@ func handleAsk(w http.ResponseWriter, r *http.Request) {
     }
 
     ollamaReqReader := strings.NewReader(string(ollamaReqBody))
-    ollamaResp, err := client.Post("http://localhost:11434/api/generate", "application/json", ollamaReqReader)
+    ollamaResp, err := client.Post("http://localhost:12345/api/generate", "application/json", ollamaReqReader)
     if err != nil {
         http.Error(w, "Failed to connect to API", http.StatusInternalServerError)
         return

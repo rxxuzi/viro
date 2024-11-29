@@ -25,6 +25,9 @@ export function Header({ mode, setMode, onMenuClick }: HeaderProps) {
             <h1 className="text-2xl font-bold bg-gradient-to-r from-[#00D1FF] to-[#FF3DFF] bg-clip-text text-transparent select-none">
               VIRO AI
             </h1>
+            <p className="bg-clip-text text-transparent text-white/30 select-none">
+              v0.1.4
+            </p>
           </div>
         </div>
         <ModeSelector mode={mode} setMode={setMode} />

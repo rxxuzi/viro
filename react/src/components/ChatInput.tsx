@@ -18,14 +18,16 @@ interface ChatInputProps {
 }
 
 const languages = [
-  { id: 'javascript', label: 'JavaScript' },
-  { id: 'typescript', label: 'TypeScript' },
+  { id: 'c', label: 'C' },
+  { id: 'asm', label: 'Assembly' },
+  { id: 'java', label: 'Java' },
   { id: 'python', label: 'Python' },
   { id: 'go', label: 'Go' },
-  { id: 'java', label: 'Java' },
-  { id: 'cpp', label: 'C++' },
-  { id: 'c', label: 'C' },
   { id: 'rust', label: 'Rust' },
+  { id: 'scala', label: 'Scala' },
+  { id: 'javascript', label: 'JavaScript' },
+  { id: 'typescript', label: 'TypeScript' },
+  { id: 'php', label: 'PHP' },
 ];
 
 const modeColors = {
@@ -121,7 +123,7 @@ export function ChatInput({
                     type="file"
                     className="hidden"
                     onChange={handleFileChange}
-                    accept=".c,.py,.java,.js,.cpp,.go,.txt,.md,.html,.php"
+                    accept=".c,.py,.java,.js,.go,.txt,.md,.html,.php,.asm,.tsx,.jsx,.json,.yaml,.csv"
                   />
                 </label>
 

@@ -7,14 +7,16 @@ interface LanguageSelectorProps {
 }
 
 const languages = [
-  { id: 'javascript', label: 'JavaScript' },
-  { id: 'typescript', label: 'TypeScript' },
-  { id: 'python', label: 'Python' },
-  { id: 'go', label: 'Go' },
-  { id: 'java', label: 'Java' },
-  { id: 'cpp', label: 'C++' },
-  { id: 'c', label: 'C' },
-  { id: 'rust', label: 'Rust' },
+    { id: 'c', label: 'C' },
+    { id: 'asm', label: 'Assembly' },
+    { id: 'java', label: 'Java' },
+    { id: 'python', label: 'Python' },
+    { id: 'go', label: 'Go' },
+    { id: 'rust', label: 'Rust' },
+    { id: 'scala', label: 'Scala' },
+    { id: 'javascript', label: 'JavaScript' },
+    { id: 'typescript', label: 'TypeScript' },
+    { id: 'php', label: 'PHP' },
 ];
 
 export function LanguageSelector({ language, setLanguage }: LanguageSelectorProps) {
