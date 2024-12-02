@@ -130,12 +130,12 @@ export default function App() {
       />
 
       <main className={`flex-1 container mx-auto px-4 transition-all duration-500 ease-in-out ${
-        hasInteracted ? 'pt-24 pb-28' : 'pt-0 flex items-center'
+        hasInteracted ? 'pt-24 pb-40' : 'pt-0 flex items-center'
       }`}>
         <div className={`transition-all duration-500 ease-in-out ${
           hasInteracted ? 'opacity-100' : 'opacity-0'
         } ${cleanupInProgress ? 'opacity-0' : ''}`}>
-          <div className="max-w-4xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-6 mb-20">
             {messages.map((message) => (
               <Message
                 key={message.id}

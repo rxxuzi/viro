@@ -28,7 +28,6 @@ export function Message({ message, onRegenerate }: MessageProps) {
       setTimeout(() => setCopiedBlock(null), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
-      // Fallback for browsers that don't support clipboard API
       const textArea = document.createElement('textarea');
       textArea.value = code;
       document.body.appendChild(textArea);
@@ -51,7 +50,6 @@ export function Message({ message, onRegenerate }: MessageProps) {
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
-      // Fallback for browsers that don't support clipboard API
       const textArea = document.createElement('textarea');
       textArea.value = message.content;
       document.body.appendChild(textArea);
@@ -93,7 +91,7 @@ export function Message({ message, onRegenerate }: MessageProps) {
 
   return (
     <div
-      className={`p-6 rounded-2xl shadow-lg transition-all duration-200 mb-16 ${
+      className={`p-6 rounded-2xl shadow-lg transition-all duration-200 ${
         message.role === 'user'
           ? 'ml-4 md:ml-12 bg-gradient-to-r from-[#FF3DFF]/10 to-[#00D1FF]/10 border border-[#FF3DFF]/20'
           : 'mr-4 md:mr-12 bg-[#1A1A1A] border border-white/10 hover:border-white/20'
@@ -153,7 +151,7 @@ export function Message({ message, onRegenerate }: MessageProps) {
                 </div>
                 <SyntaxHighlighter
                   style={vscDarkPlus}
-                  language={match[1]}
+                  language={match[1] || 'plaintext'}
                   PreTag="div"
                   className="rounded-xl !mt-0 !bg-[#1E1E1E] !p-4 !pt-16"
                   customStyle={{
@@ -197,13 +195,6 @@ export function Message({ message, onRegenerate }: MessageProps) {
           >
             <ThumbsDown className="w-4 h-4" />
           </button>
-          {/* <button
-            onClick={onRegenerate}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-[#00D1FF]"
-            title="Regenerate response"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button> */}
           <button
             onClick={handleReport}
             className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-[#FF8A00]"
