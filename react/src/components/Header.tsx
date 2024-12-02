@@ -26,7 +26,7 @@ export function Header({ mode, setMode, onMenuClick }: HeaderProps) {
               VIRO AI
             </h1>
             <p className="bg-clip-text text-transparent text-white/30 select-none">
-              v0.1.4
+              v0.1.5
             </p>
           </div>
         </div>

@@ -12,10 +12,13 @@ import (
     "os"
     "path/filepath"
     "strings"
+
+    "github.com/rxxuzi/viro/pkg/handlers"
 )
 
-const version = "0.1.4"
+const version = "0.1.5"
 const maxsize = 10 << 20 // 10MB
+
 var model string
 var prompts []string
 var debug bool
@@ -44,10 +47,15 @@ func main() {
 
     http.HandleFunc("/api/ask", handleAsk)
 
+    // 評価用のハンドラを追加
+    http.HandleFunc("/api/eval/good", handlers.EvalGoodHandler)
+    http.HandleFunc("/api/eval/bad", handlers.EvalBadHandler)
+    http.HandleFunc("/api/report", handlers.ReportHandler)
+
     http.HandleFunc("/license", func(w http.ResponseWriter, r *http.Request) {
         http.ServeFile(w, r, "./www/license.html")
     })
-    
+
     fs := http.FileServer(http.Dir("./www"))
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         path := r.URL.Path
@@ -106,7 +114,7 @@ func handleAsk(w http.ResponseWriter, r *http.Request) {
         }
 
         ext := filepath.Ext(header.Filename)
-        allowedExtensions := []string{".c", ".py", ".java", ".js", ".cpp", ".go", ".txt", ".md", ".html", ".php",".tsx"}
+        allowedExtensions := []string{".c", ".py", ".java", ".js", ".cpp", ".go", ".txt", ".md", ".html", ".php", ".tsx"}
         allowed := false
         for _, allowedExt := range allowedExtensions {
             if ext == allowedExt {
