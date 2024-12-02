@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100" width="300" height="100">
+    <defs>
+        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#3a86ff"/>
+            <stop offset="100%" style="stop-color:#ff006e"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Pyramid with eye -->
+    <g transform="translate(0, 6.5) scale(0.85)">
+        <path d="M50 0 L100 87 L0 87 Z" fill="url(#logoGradient)"/>
+        <path d="M20 48.5 C20 48.5 35 33 50 33 C65 33 80 48.5 80 48.5 C80 48.5 65 64 50 64 C35 64 20 48.5 20 48.5 Z" fill="white"/>
+        <circle cx="50" cy="48.5" r="15" fill="url(#logoGradient)"/>
+    </g>
+
+    <!-- Text "viro" -->
+    <text x="110" y="70" font-family="Arial, sans-serif" font-size="70" font-weight="bold" fill="url(#logoGradient)">viro</text>
+</svg>
