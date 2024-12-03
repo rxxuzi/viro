@@ -9,6 +9,7 @@ import rehypeRaw from 'rehype-raw';
 import { Copy, Check, ThumbsUp, ThumbsDown, Flag } from 'lucide-react';
 import { submitEvaluation } from '../utils/evaluation';
 import { getBrowserId } from '../utils/browserId';
+import { ModelType } from '../types/models';
 
 interface MessageProps {
   message: {
@@ -17,9 +18,10 @@ interface MessageProps {
   };
   onRegenerate?: () => void;
   question?: string;
+  model: ModelType;
 }
 
-export function Message({ message, onRegenerate, question }: MessageProps) {
+export function Message({ message, onRegenerate, question, model }: MessageProps) {
   const [copiedBlock, setCopiedBlock] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<'good' | 'bad' | null>(null);
   const [copied, setCopied] = useState(false);
@@ -78,6 +80,7 @@ export function Message({ message, onRegenerate, question }: MessageProps) {
       a: message.content,
       t: Math.floor(Date.now() / 1000),
       i: getBrowserId(),
+      m: model,
     });
 
     if (success) {
@@ -95,6 +98,7 @@ export function Message({ message, onRegenerate, question }: MessageProps) {
       a: message.content,
       t: Math.floor(Date.now() / 1000),
       i: getBrowserId(),
+      m: model,
     });
     setIsSubmitting(false);
   };

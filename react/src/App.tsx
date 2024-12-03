@@ -156,6 +156,7 @@ export default function App() {
                 key={message.id}
                 message={message}
                 question={message.question}
+                model={model}
                 onRegenerate={message.role === 'assistant' ? handleRegenerate : undefined}
               />
             ))}
@@ -171,7 +172,6 @@ export default function App() {
           isLoading={isLoading}
           mode={mode}
           model={model}
-          setModel={setModel}
           language={language}
           setLanguage={setLanguage}
           onSubmit={handleSubmit}

@@ -14,6 +14,7 @@ type Evaluation struct {
     A string `json:"a"`
     T int64  `json:"t"`
     I string `json:"i"`
+    M string `json:"m"`
 }
 
 func saveEvaluation(e Evaluation, dir string) error {
