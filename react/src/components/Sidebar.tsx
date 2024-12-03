@@ -28,7 +28,10 @@ export function Sidebar({ isOpen, onClose, onCleanup }: SidebarProps) {
         }`}
       >
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-white">Menu</h2>
+          <div>
+            <h2 className="text-xl font-bold text-white">Menu</h2>
+            <p className="text-white/30 text-sm">Version 1.0.0</p>
+          </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-white/10 rounded-lg transition-colors"

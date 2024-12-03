@@ -6,7 +6,9 @@ import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
-import { Copy, Check, ThumbsUp, ThumbsDown, RefreshCw, Flag } from 'lucide-react';
+import { Copy, Check, ThumbsUp, ThumbsDown, Flag } from 'lucide-react';
+import { submitEvaluation } from '../utils/evaluation';
+import { getBrowserId } from '../utils/browserId';
 
 interface MessageProps {
   message: {
@@ -14,12 +16,14 @@ interface MessageProps {
     content: string;
   };
   onRegenerate?: () => void;
+  question?: string;
 }
 
-export function Message({ message, onRegenerate }: MessageProps) {
+export function Message({ message, onRegenerate, question }: MessageProps) {
   const [copiedBlock, setCopiedBlock] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<'good' | 'bad' | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCopyCode = async (code: string) => {
     try {
@@ -65,28 +69,34 @@ export function Message({ message, onRegenerate }: MessageProps) {
     }
   };
 
-  const handleFeedback = (type: 'good' | 'bad') => {
-    if (feedback !== type) {
+  const handleFeedback = async (type: 'good' | 'bad') => {
+    if (feedback === type || isSubmitting || message.role !== 'assistant') return;
+
+    setIsSubmitting(true);
+    const success = await submitEvaluation(type, {
+      q: question || '',
+      a: message.content,
+      t: Math.floor(Date.now() / 1000),
+      i: getBrowserId(),
+    });
+
+    if (success) {
       setFeedback(type);
     }
+    setIsSubmitting(false);
   };
 
   const handleReport = async () => {
-    try {
-      await fetch('/api/report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question: message.role === 'assistant' ? '' : message.content,
-          answer: message.role === 'assistant' ? message.content : '',
-          date: new Date().toISOString(),
-        }),
-      });
-    } catch (error) {
-      console.error('Failed to report:', error);
-    }
+    if (isSubmitting || message.role !== 'assistant') return;
+
+    setIsSubmitting(true);
+    await submitEvaluation('report', {
+      q: question || '',
+      a: message.content,
+      t: Math.floor(Date.now() / 1000),
+      i: getBrowserId(),
+    });
+    setIsSubmitting(false);
   };
 
   return (
@@ -179,25 +189,30 @@ export function Message({ message, onRegenerate }: MessageProps) {
         <div className="flex items-center gap-2 mt-4">
           <button
             onClick={() => handleFeedback('good')}
+            disabled={isSubmitting}
             className={`p-2 hover:bg-white/10 rounded-lg transition-colors ${
               feedback === 'good' ? 'text-[#00FF94] bg-white/10' : 'text-white/70 hover:text-[#00FF94]'
-            }`}
+            } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             title="Good response"
           >
             <ThumbsUp className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleFeedback('bad')}
+            disabled={isSubmitting}
             className={`p-2 hover:bg-white/10 rounded-lg transition-colors ${
               feedback === 'bad' ? 'text-[#FF3DFF] bg-white/10' : 'text-white/70 hover:text-[#FF3DFF]'
-            }`}
+            } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             title="Bad response"
           >
             <ThumbsDown className="w-4 h-4" />
           </button>
           <button
             onClick={handleReport}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-[#FF8A00]"
+            disabled={isSubmitting}
+            className={`p-2 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-[#FF8A00] ${
+              isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             title="Report response"
           >
             <Flag className="w-4 h-4" />

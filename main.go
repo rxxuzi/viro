@@ -16,17 +16,17 @@ import (
     "github.com/rxxuzi/viro/pkg/handlers"
 )
 
-const version = "0.1.5"
+const version = "0.2.0"
 const maxsize = 10 << 20 // 10MB
-
-var model string
+const defaultModel = "viro:durian"
+var initModel string
 var prompts []string
 var debug bool
 var port string
 var showVersion bool
 
 func main() {
-    flag.StringVar(&model, "m", "viro:70b", "Model name")
+    flag.StringVar(&initModel, "m", defaultModel, "Model name")
     flag.BoolVar(&debug, "d", false, "Enable debug mode")
     flag.StringVar(&port, "p", "9200", "Port to run the server on")
     flag.BoolVar(&showVersion, "v", false, "Show version and exit")
@@ -69,7 +69,7 @@ func main() {
     })
 
     log.Printf("Start the server on port -> %s\n", port)
-    log.Printf("Model : %s", model)
+    log.Printf("Model : %s", initModel)
     log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
@@ -93,11 +93,13 @@ func handleAsk(w http.ResponseWriter, r *http.Request) {
     question := r.FormValue("question")
     language := r.FormValue("language")
     mode := r.FormValue("mode")
+    model := r.FormValue("model")
 
     if debug {
         log.Printf("Query : %s", question)
         log.Printf("Lang  : %s", language)
         log.Printf("Mode  : %s", mode)
+        log.Printf("Model : %s", model)
     }
 
     var fileContent string

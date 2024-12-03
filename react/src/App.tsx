@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { ChatInput } from './components/ChatInput';
 import { Message } from './components/Message';
+import { ModelType, getModelValue } from './types/models';
 
 export type Mode = 'ask' | 'code' | 'docs' | 'fix';
 
@@ -10,6 +11,7 @@ interface MessageType {
   role: 'user' | 'assistant';
   content: string;
   id: string;
+  question?: string;
 }
 
 export default function App() {
@@ -18,6 +20,7 @@ export default function App() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<Mode>('ask');
+  const [model, setModel] = useState<ModelType>('durian');
   const [language, setLanguage] = useState('javascript');
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -53,11 +56,16 @@ export default function App() {
     formData.append('question', input);
     formData.append('mode', mode);
     formData.append('language', language);
+    formData.append('model', getModelValue(model));
     if (file) {
       formData.append('file', file);
     }
 
-    const newMessage = { role: 'user' as const, content: input, id: Date.now().toString() };
+    const newMessage = { 
+      role: 'user' as const, 
+      content: input, 
+      id: Date.now().toString(),
+    };
     setMessages(prev => [...prev, newMessage]);
     setInput('');
     setIsLoading(true);
@@ -96,7 +104,12 @@ export default function App() {
                 lastMessage.content = accumulatedContent;
                 return [...newMessages];
               }
-              return [...prev, { role: 'assistant', content: accumulatedContent, id: Date.now().toString() }];
+              return [...prev, { 
+                role: 'assistant', 
+                content: accumulatedContent, 
+                id: Date.now().toString(),
+                question: input 
+              }];
             });
           } catch (e) {
             console.error('Error parsing JSON:', e);
@@ -121,6 +134,8 @@ export default function App() {
       <Header
         mode={mode}
         setMode={setMode}
+        model={model}
+        setModel={setModel}
         onMenuClick={() => setIsSidebarOpen(true)}
       />
       <Sidebar
@@ -140,6 +155,7 @@ export default function App() {
               <Message
                 key={message.id}
                 message={message}
+                question={message.question}
                 onRegenerate={message.role === 'assistant' ? handleRegenerate : undefined}
               />
             ))}
@@ -154,6 +170,8 @@ export default function App() {
           setFile={setFile}
           isLoading={isLoading}
           mode={mode}
+          model={model}
+          setModel={setModel}
           language={language}
           setLanguage={setLanguage}
           onSubmit={handleSubmit}

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Send, Paperclip, Loader2, Code } from 'lucide-react';
 import { Mode } from '../App';
 import { FilePreviewModal } from './FilePreviewModal';
+import { ModelType } from '../types/models';
 
 interface ChatInputProps {
   input: string;
@@ -10,6 +11,7 @@ interface ChatInputProps {
   setFile: (file: File | null) => void;
   isLoading: boolean;
   mode: Mode;
+  model: ModelType;
   language: string;
   setLanguage: (language: string) => void;
   onSubmit: (e: React.FormEvent) => void;
