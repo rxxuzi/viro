@@ -15,7 +15,7 @@ export const models: Model[] = [
   {
     id: 'mango',
     label: 'Mango',
-    description: 'Focused on math reasoning'
+    description: 'Deprecated model'
   },
   {
     id: 'guava',
