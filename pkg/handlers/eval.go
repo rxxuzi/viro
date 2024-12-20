@@ -10,11 +10,12 @@ import (
 )
 
 type Evaluation struct {
-    Q string `json:"q"`
-    A string `json:"a"`
-    T int64  `json:"t"`
-    I string `json:"i"`
-    M string `json:"m"`
+    Q string `json:"q"` // question
+    A string `json:"a"` // answer
+    T int64  `json:"t"` // timestamp
+    I string `json:"i"` // id
+    M string `json:"m"` // model
+    
 }
 
 func saveEvaluation(e Evaluation, dir string) error {
@@ -44,7 +45,7 @@ func ReportHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleEval(w http.ResponseWriter, r *http.Request, dir string) {
-    EnableCors(&w)
+    EnableCors(w)
 
     if r.Method != http.MethodPost {
         http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
