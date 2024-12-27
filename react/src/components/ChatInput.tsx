@@ -17,6 +17,7 @@ interface ChatInputProps {
   onSubmit: (e: React.FormEvent) => void;
   error?: string;
   className?: string;
+  enterToSubmit: boolean;
 }
 
 const languages = [
@@ -51,6 +52,7 @@ export function ChatInput({
   onSubmit,
   error,
   className = '',
+  enterToSubmit,
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,9 +61,14 @@ export function ChatInput({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      onSubmit(e);
+    if (e.key === 'Enter') {
+      if (enterToSubmit && !e.shiftKey) {
+        e.preventDefault();
+        onSubmit(e);
+      } else if (!enterToSubmit && e.shiftKey) {
+        e.preventDefault();
+        onSubmit(e);
+      }
     }
   };
 
@@ -102,7 +109,7 @@ export function ChatInput({
                 onKeyDown={handleKeyDown}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                placeholder="How can Viro help you today? (Shift + Enter for new line)"
+                placeholder={enterToSubmit ? "How can Viro help you today? (Shift + Enter for new line)" : "How can Viro help you today? (Enter for new line, Shift + Enter to submit)"}
                 className="w-full bg-transparent px-6 py-3 resize-none text-white min-h-[46px] placeholder:text-white/30 focus:outline-none focus:ring-0 border-none"
                 style={{ maxHeight: '100px', overflowY: 'auto' }}
               />

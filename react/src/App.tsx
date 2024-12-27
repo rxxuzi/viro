@@ -14,6 +14,8 @@ interface MessageType {
   question?: string;
 }
 
+const ENTER_TO_SUBMIT_KEY = 'viro_enter_to_submit';
+
 export default function App() {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [input, setInput] = useState('');
@@ -26,6 +28,10 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [cleanupInProgress, setCleanupInProgress] = useState(false);
+  const [enterToSubmit, setEnterToSubmit] = useState(() => {
+    const saved = localStorage.getItem(ENTER_TO_SUBMIT_KEY);
+    return saved !== null ? JSON.parse(saved) : true;
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -35,6 +41,10 @@ export default function App() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem(ENTER_TO_SUBMIT_KEY, JSON.stringify(enterToSubmit));
+  }, [enterToSubmit]);
 
   const handleCleanup = () => {
     setCleanupInProgress(true);
@@ -142,6 +152,8 @@ export default function App() {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         onCleanup={handleCleanup}
+        enterToSubmit={enterToSubmit}
+        onEnterToSubmitChange={setEnterToSubmit}
       />
 
       <main className={`flex-1 container mx-auto px-4 transition-all duration-500 ease-in-out ${
@@ -177,6 +189,7 @@ export default function App() {
           onSubmit={handleSubmit}
           error={error}
           className={hasInteracted ? '' : 'max-w-2xl mx-auto'}
+          enterToSubmit={enterToSubmit}
         />
       </main>
     </div>

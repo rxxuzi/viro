@@ -1,10 +1,12 @@
 import React from 'react';
-import { X, Shield, HelpCircle, FileText, Trash2 } from 'lucide-react';
+import { X, Shield, HelpCircle, FileText, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onCleanup: () => void;
+  enterToSubmit: boolean;
+  onEnterToSubmitChange: (value: boolean) => void;
 }
 
 const menuItems = [
@@ -13,7 +15,7 @@ const menuItems = [
   { icon: FileText, label: 'License', path: '/license' },
 ];
 
-export function Sidebar({ isOpen, onClose, onCleanup }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, onCleanup, enterToSubmit, onEnterToSubmitChange }: SidebarProps) {
   return (
     <>
       <div
@@ -39,25 +41,49 @@ export function Sidebar({ isOpen, onClose, onCleanup }: SidebarProps) {
             <X className="w-5 h-5" />
           </button>
         </div>
-        <nav className="space-y-2">
-          {menuItems.map(({ icon: Icon, label, path }) => (
-            <a
-              key={path}
-              href={path}
-              className="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+
+        <div className="space-y-6">
+          <div className="px-4 py-3 bg-white/5 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-white">Enter to Submit</h3>
+                <p className="text-xs text-white/50">
+                  {enterToSubmit ? 'Press Shift + Enter for new line' : 'Press Enter for new line'}
+                </p>
+              </div>
+              <button
+                onClick={() => onEnterToSubmitChange(!enterToSubmit)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                {enterToSubmit ? (
+                  <ToggleRight className="w-6 h-6 text-[#00D1FF]" />
+                ) : (
+                  <ToggleLeft className="w-6 h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <nav className="space-y-2">
+            {menuItems.map(({ icon: Icon, label, path }) => (
+              <a
+                key={path}
+                href={path}
+                className="flex items-center gap-3 px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <Icon className="w-5 h-5" />
+                <span>{label}</span>
+              </a>
+            ))}
+            <button
+              onClick={onCleanup}
+              className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <Icon className="w-5 h-5" />
-              <span>{label}</span>
-            </a>
-          ))}
-          <button
-            onClick={onCleanup}
-            className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-white/10 rounded-lg transition-colors"
-          >
-            <Trash2 className="w-5 h-5" />
-            <span>Cleanup Chat</span>
-          </button>
-        </nav>
+              <Trash2 className="w-5 h-5" />
+              <span>Cleanup Chat</span>
+            </button>
+          </nav>
+        </div>
       </div>
     </>
   );
