@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Shield, HelpCircle, FileText, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { APP_NAME, VERSION } from '../App';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -31,8 +32,8 @@ export function Sidebar({ isOpen, onClose, onCleanup, enterToSubmit, onEnterToSu
       >
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-xl font-bold text-white">Menu</h2>
-            <p className="text-white/30 text-sm">Version 1.1.0</p>
+            <h2 className="text-xl font-bold text-white">{APP_NAME} Menu</h2>
+            <p className="text-white/30 text-sm">Version {VERSION}</p>
           </div>
           <button
             onClick={onClose}

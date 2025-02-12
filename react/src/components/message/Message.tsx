@@ -11,10 +11,97 @@ import { submitEvaluation } from '../utils/evaluation';
 import { getBrowserId } from '../utils/browserId';
 import { ModelType } from '../types/models';
 
-// ... (keep existing interfaces)
+interface MessageProps {
+  message: {
+    role: 'user' | 'assistant';
+    content: string;
+  };
+  onRegenerate?: () => void;
+  question?: string;
+  model: ModelType;
+}
 
 export function Message({ message, onRegenerate, question, model }: MessageProps) {
-  // ... (keep existing state and handlers)
+  const [copiedBlock, setCopiedBlock] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<'good' | 'bad' | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCopyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedBlock(code);
+      setTimeout(() => setCopiedBlock(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      const textArea = document.createElement('textarea');
+      textArea.value = code;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopiedBlock(code);
+        setTimeout(() => setCopiedBlock(null), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const handleCopyRaw = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      const textArea = document.createElement('textarea');
+      textArea.value = message.content;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const handleFeedback = async (type: 'good' | 'bad') => {
+    if (feedback === type || isSubmitting || message.role !== 'assistant') return;
+
+    setIsSubmitting(true);
+    const success = await submitEvaluation(type, {
+      q: question || '',
+      a: message.content,
+      t: Math.floor(Date.now() / 1000),
+      i: getBrowserId(),
+      m: model,
+    });
+
+    if (success) {
+      setFeedback(type);
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleReport = async () => {
+    if (isSubmitting || message.role !== 'assistant') return;
+
+    setIsSubmitting(true);
+    await submitEvaluation('report', {
+      q: question || '',
+      a: message.content,
+      t: Math.floor(Date.now() / 1000),
+      i: getBrowserId(),
+      m: model,
+    });
+    setIsSubmitting(false);
+  };
 
   return (
     <div
@@ -28,21 +115,48 @@ export function Message({ message, onRegenerate, question, model }: MessageProps
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex, rehypeRaw]}
         components={{
-          // ... (keep existing heading components)
-
+          h1: ({ node, ...props }) => (
+            <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-[#00D1FF] to-[#FF3DFF] bg-clip-text text-transparent" {...props} />
+          ),
+          h2: ({ node, ...props }) => (
+            <h2 className="text-2xl font-bold mb-4 text-white/90" {...props} />
+          ),
+          h3: ({ node, ...props }) => (
+            <h3 className="text-xl font-semibold mb-3 text-white/80" {...props} />
+          ),
+          a: ({ node, ...props }) => (
+            <a 
+              className="text-[#00D1FF] hover:text-[#FF3DFF] transition-colors duration-300 border-b border-[#00D1FF]/30 hover:border-[#FF3DFF]"
+              target="_blank"
+              rel="noopener noreferrer"
+              {...props}
+            />
+          ),
+          p: ({ node, ...props }) => (
+            <p className="mb-4 leading-relaxed" {...props} />
+          ),
+          ul: ({ node, ...props }) => (
+            <ul className="mb-4 pl-6 space-y-2" {...props} />
+          ),
+          ol: ({ node, ...props }) => (
+            <ol className="mb-4 pl-6 space-y-2" {...props} />
+          ),
+          li: ({ node, ...props }) => (
+            <li className="relative before:absolute before:left-[-1em] before:content-['•'] before:text-[#00D1FF]" {...props} />
+          ),
           table: ({ node, ...props }) => (
-            <div className="my-6 w-full overflow-x-auto rounded-lg border border-white/10">
+            <div className="my-6 w-full overflow-x-auto rounded-xl border border-white/10">
               <table className="w-full border-collapse bg-[#0D0D0D]" {...props} />
             </div>
           ),
           thead: ({ node, ...props }) => (
-            <thead className="bg-[#1A1A1A] border-b border-white/10" {...props} />
+            <thead className="bg-gradient-to-r from-[#1A1A1A] to-[#252525] border-b border-white/10" {...props} />
           ),
           th: ({ node, ...props }) => (
-            <th className="px-6 py-3 text-left text-sm font-semibold text-white/90" {...props} />
+            <th className="px-6 py-4 text-left text-sm font-semibold text-white/90 first:rounded-tl-xl last:rounded-tr-xl whitespace-nowrap" {...props} />
           ),
           td: ({ node, ...props }) => (
-            <td className="px-6 py-4 text-sm border-t border-white/5" {...props} />
+            <td className="px-6 py-4 text-sm border-t border-white/5 [&>code]:bg-black/30 [&>code]:rounded [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:font-mono [&>code]:text-sm [&>.katex]:!text-white [&>.katex]:whitespace-nowrap" {...props} />
           ),
           tr: ({ node, ...props }) => (
             <tr className="hover:bg-white/5 transition-colors" {...props} />
@@ -51,42 +165,35 @@ export function Message({ message, onRegenerate, question, model }: MessageProps
             const match = /language-(\w+)/.exec(className || '');
             const code = String(children).replace(/\n$/, '');
             
-            return !inline ? (
-              <div className="relative my-6 first:mt-0 last:mb-0">
-                <div className="relative">
-                  <div 
-                    className="sticky top-0 right-0 left-0 h-12 bg-[#1E1E1E] border-b border-white/10 rounded-t-xl flex items-center justify-between px-4"
-                    style={{ zIndex: 20 }}
+            return !inline && match ? (
+              <div className="relative group my-6 first:mt-0 last:mb-0">
+                <div className="absolute top-0 right-0 left-0 h-12 bg-[#1E1E1E] border-b border-white/10 rounded-t-xl flex items-center justify-between px-4 z-10">
+                  <span className="text-sm text-white/50 font-mono">{match[1]}</span>
+                  <button
+                    onClick={() => handleCopyCode(code)}
+                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                   >
-                    <span className="text-sm text-white/50 font-mono">{match?.[1] || 'plaintext'}</span>
-                    <button
-                      onClick={() => handleCopyCode(code)}
-                      className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                    >
-                      {copiedBlock === code ? (
-                        <Check className="w-4 h-4 text-green-400" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-white/50" />
-                      )}
-                    </button>
-                  </div>
-                  <div className="relative" style={{ zIndex: 10 }}>
-                    <SyntaxHighlighter
-                      style={vscDarkPlus}
-                      language={match?.[1] || 'plaintext'}
-                      PreTag="div"
-                      className="rounded-xl !mt-0 !bg-[#1E1E1E] !p-4 !pt-16"
-                      customStyle={{
-                        margin: 0,
-                        borderRadius: '0.75rem',
-                        background: '#1E1E1E',
-                      }}
-                      {...props}
-                    >
-                      {code}
-                    </SyntaxHighlighter>
-                  </div>
+                    {copiedBlock === code ? (
+                      <Check className="w-4 h-4 text-green-400" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-white/50" />
+                    )}
+                  </button>
                 </div>
+                <SyntaxHighlighter
+                  style={vscDarkPlus}
+                  language={match[1]}
+                  PreTag="div"
+                  className="rounded-xl !mt-0 !bg-[#1E1E1E] !p-4 !pt-16"
+                  customStyle={{
+                    margin: 0,
+                    borderRadius: '0.75rem',
+                    background: '#1E1E1E',
+                  }}
+                  {...props}
+                >
+                  {code}
+                </SyntaxHighlighter>
               </div>
             ) : (
               <code className="bg-black/30 rounded px-1.5 py-0.5 font-mono text-sm" {...props}>
@@ -96,7 +203,7 @@ export function Message({ message, onRegenerate, question, model }: MessageProps
           },
         }}
       >
-        {processedContent}
+        {message.content}
       </ReactMarkdown>
 
       {message.role === 'assistant' && (

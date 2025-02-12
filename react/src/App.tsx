@@ -6,6 +6,9 @@ import { Message } from './components/Message';
 import { ModelType, getModelValue } from './types/models';
 
 export type Mode = 'ask' | 'code' | 'docs' | 'fix';
+export const APP_NAME = 'viro';
+export const VERSION = '1.2.3';
+export const API_ENDPOINT = 'http://0.0.0.0:9000';
 
 interface MessageType {
   role: 'user' | 'assistant';
@@ -81,7 +84,7 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://10.133.0.61:9200/api/ask', {
+      const response = await fetch(`{API_ENDPOINT}/api/ask`, {
         method: 'POST',
         body: formData,
       });

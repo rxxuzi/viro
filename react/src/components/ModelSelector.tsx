@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ModelType, models } from '../types/models';
 import { DurianIcon, MangoIcon, GuavaIcon } from './ModelIcons';
 import { ChevronDown } from 'lucide-react';
+import { APP_NAME } from '../App';
 
 interface ModelSelectorProps {
   model: ModelType;
@@ -42,7 +43,7 @@ export function ModelSelector({ model, setModel }: ModelSelectorProps) {
         <div className="flex items-center gap-2">
           <img src="/viro-logo.svg" alt="VIRO" className="h-6" />
           <span className="text-lg font-bold bg-gradient-to-r from-[#00D1FF] to-[#FF3DFF] bg-clip-text text-transparent">
-            VIRO
+            {APP_NAME}
           </span>
           {getModelIcon(model)}
           <span className="text-white/90">
